@@ -8,8 +8,8 @@ import tensorflow as tf
 app = Flask(__name__)
 
 # Ładowanie modelu TensorFlow
-model_filename = 'model.h5'  # Upewnij się, że ścieżka do modelu jest poprawna
-loaded_model = tf.keras.models.load_model(model_filename)
+model_filenames = ['ensemble_cnn_model_model_0.h5', 'ensemble_cnn_model_model_1.h5', 'ensemble_cnn_model_model_2.h5']  # Ścieżki do modelu
+loaded_models = [tf.keras.models.load_model(filename) for filename in model_filenames]
 
 @app.route('/')
 def index():
