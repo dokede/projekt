@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 import io
 import base64
-import tensorflow as tf  # Używamy TensorFlow do ładowania modelu
+import tensorflow as tf
 
 app = Flask(__name__)
 
@@ -28,13 +28,13 @@ def predict():
         # Konwertowanie obrazu do odcieni szarości
         image = image.convert("L")
         # Zmiana rozmiaru obrazu na 28x28
-        image = image.resize((28, 28), Image.ANTIALIAS)
+        image = image.resize((28, 28), Image.LANCZOS)  # Zmiana na LANCZOS
 
         # Przekształcenie obrazu w tablicę NumPy
         image_array = np.array(image)
 
-        # Spłaszczenie tablicy do jednego wymiaru (784 cechy)
-        image_array = image_array.flatten().reshape(1, 28 * 28)  # Zmieniamy kształt do (1, 784)
+        # Rozszerzenie wymiarów, aby uzyskać kształt (1, 28, 28, 1)
+        image_array = image_array.reshape(1, 28, 28, 1)
 
         # Normalizacja danych
         image_array = image_array.astype(np.float32) / 255.0
@@ -53,11 +53,6 @@ def predict():
         return jsonify({'error': str(e)}), 500  # Zwróć błąd w formacie JSON
 
 if __name__ == "__main__":
-    # Importujemy `os`, aby pobrać numer portu z zmiennej środowiskowej
     import os
-    
-    # Pobieramy port z systemu, domyślnie ustawiamy na 5000 (na wypadek, gdyby zmienna nie była ustawiona)
     port = int(os.environ.get("PORT", 5000))
-    
-    # Uruchamiamy aplikację na podanym porcie
     app.run(host="0.0.0.0", port=port, debug=True)
