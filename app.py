@@ -8,7 +8,7 @@ import tensorflow as tf  # Używamy TensorFlow do ładowania modelu
 app = Flask(__name__)
 
 # Ładowanie modelu TensorFlow
-model_filename = '/home/dokede/mysite/model.h5'  # Upewnij się, że ścieżka do modelu jest poprawna
+model_filename = 'model.h5'  # Upewnij się, że ścieżka do modelu jest poprawna
 loaded_model = tf.keras.models.load_model(model_filename)
 
 @app.route('/')
