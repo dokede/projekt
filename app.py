@@ -8,8 +8,8 @@ import tensorflow as tf
 app = Flask(__name__)
 
 # Ładowanie modelu TensorFlow
-model_filenames = ['ensemble_cnn_model_model_0.h5', 'ensemble_cnn_model_model_1.h5', 'ensemble_cnn_model_model_2.h5']  # Ścieżki do modelu
-loaded_models = [tf.keras.models.load_model(filename) for filename in model_filenames]
+model_filename = 'mnist_cnn_model.h5'
+loaded_model = tf.keras.models.load_model(model_filename)
 
 @app.route('/')
 def index():
@@ -39,10 +39,10 @@ def predict():
         # Normalizacja danych
         image_array = image_array.astype(np.float32) / 255.0
 
-        predictions = [model.predict(image_array) for model in loaded_models]
-        avg_prediction = np.mean(predictions, axis=0)  # Oblicz średnią prognozę
-        predicted_class = np.argmax(avg_prediction)  # Najwyższa prognoza
-        confidence = np.max(avg_prediction) * 100  # Pewność
+        # Predykcja za pomocą modelu TensorFlow
+        prediction = loaded_model.predict(image_array)
+        predicted_class = np.argmax(prediction)
+        confidence = np.max(prediction) * 100
 
         return jsonify({
             'prediction': int(predicted_class),
