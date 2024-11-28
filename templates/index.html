@@ -243,18 +243,82 @@
             font-size: 0.9em;
         }
 
-        /* Drawing Section */
-        .drawing-section {
-            background-color: #222;
-            padding: 40px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-
         canvas {
             background-color: black;
             border: 1px solid white;
         }
+        /* Kontener dla rysowania i bota, Flexbox dla układu obok siebie */
+        .drawing-container {
+            display: flex;
+            gap: 20px; /* Przestrzeń pomiędzy sekcjami */
+            flex-wrap: space-between; /* Umożliwia przenoszenie na nową linię w przypadku małych ekranów */
+        }
+
+        /* Sekcja rysowania */
+        .drawing-section {
+            background-color: #222;
+            padding: 20px;
+            border-radius: 10px;
+            width: 600px;  /* Stała szerokość */
+            height: 500px; /* Stała wysokość */
+        }
+
+        /* Sekcja bota */
+        .bot-section {
+            background-color: #222;
+            padding: 20px;
+            border-radius: 10px;
+            width: 600px;  /* Stała szerokość */
+            height: 500px; /* Stała wysokość */
+        }
+
+        /* Stylizacja chatboxa */
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .chat-messages {
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .chat-messages p {
+            margin: 5px 0;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ff9800;
+            background-color: #333;
+            color: white;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #ff9800;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #e68900;
+        }
+        
+
     </style>
 </head>
 <body>
@@ -353,25 +417,37 @@
     </section>
 
     <section id="drawing">
-        <h2>Rysowanie</h2>
-        <div class="drawing-section">
-            <h1>Narysuj cyfrę</h1>
-            <canvas id="drawingCanvas" width="280" height="280"></canvas>
-            <br>
-            <button id="submitBtn">Przekaż</button>
-            <button id="clearBtn">Wyczyść</button>
-            <h2>Wynik Predykcji: <span id="predictionResult"></span></h2>
-            <h2>Pewność: <span id="confidenceResult"></span>%</h2>
+        <div class="drawing-container">
+            <!-- Sekcja Rysowania -->
+            <div class="drawing-section">
+                <h1>Narysuj cyfrę</h1>
+                <canvas id="drawingCanvas" width="280" height="280"></canvas>
+                <br>
+                <button id="submitBtn">Przekaż</button>
+                <button id="clearBtn">Wyczyść</button>
+                <h2>Wynik Predykcji: <span id="predictionResult"></span></h2>
+                <h2>Pewność: <span id="confidenceResult"></span>%</h2>
+            </div>
+            
+            <!-- Sekcja Bota -->
+            <div class="bot-section">
+                <h1>Zadaj mi pytanie</h1>
+                <div id="chatBox" class="chat-box">
+                    <div id="chatMessages" class="chat-messages"></div>
+                    <input type="text" id="userInput" placeholder="Pisz tutaj..." />
+                    <button id="sendBtn">Wyślij</button>
+                </div>
+            </div>
         </div>
-    </section>
-
+    </section>    
+    
 
     <script>
         // Drawing functionality
         const canvas = document.getElementById('drawingCanvas');
         const ctx = canvas.getContext('2d');
         let drawing = false;
-
+    
         // Normalize mouse coordinates
         function getMousePos(canvas, event) {
             const rect = canvas.getBoundingClientRect();
@@ -380,17 +456,17 @@
                 y: event.clientY - rect.top
             };
         }
-
+    
         canvas.addEventListener('mousedown', () => {
             drawing = true;
             ctx.beginPath();
         });
-
+    
         canvas.addEventListener('mouseup', () => {
             drawing = false;
             ctx.closePath();
         });
-
+    
         canvas.addEventListener('mousemove', (event) => {
             if (drawing) {
                 const pos = getMousePos(canvas, event);
@@ -402,7 +478,8 @@
                 ctx.moveTo(pos.x, pos.y); // Move to the new position
             }
         });
-
+    
+        // Submit drawing to prediction endpoint
         document.getElementById('submitBtn').addEventListener('click', async () => {
             const imageData = canvas.toDataURL('image/png');
             const response = await fetch('/predict', {
@@ -412,6 +489,61 @@
                 },
                 body: JSON.stringify({ image: imageData })
             });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Błąd w odpowiedzi:', errorData.error);
+                alert('Wystąpił błąd: ' + errorData.error);
+                return;
+            }
+    
+            const result = await response.json();
+            document.getElementById('predictionResult').innerText = 'Predykcja: ' + result.prediction;
+            document.getElementById('confidenceResult').innerText = 'Pewność: ' + result.confidence.toFixed(2) + '%';
+        });
+    
+        // Clear canvas and results
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('predictionResult').innerText = '';
+            document.getElementById('confidenceResult').innerText = '';
+        });
+    
+        // Carousel functionality
+        let currentIndex = 0;
+    
+        function moveCarousel(direction) {
+            const projects = document.querySelectorAll('.project');
+            const totalProjects = projects.length;
+            currentIndex = (currentIndex + direction + totalProjects) % totalProjects;
+            const offset = -currentIndex * (projects[0].clientWidth + 20); // Adjusted for gap
+    
+            const carouselContainer = document.querySelector('.carousel-container');
+            carouselContainer.style.transform = `translateX(${offset}px)`;
+        }
+    
+        // Bot functionality
+        document.getElementById('sendBtn').addEventListener('click', async () => {
+            const userMessage = document.getElementById('userInput').value.trim();
+            
+            if (!userMessage) {
+                alert("Proszę wpisać wiadomość.");
+                return;
+            }
+
+            // Show user's message in chat
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML += `<div><strong>You:</strong> ${userMessage}</div>`;
+            document.getElementById('userInput').value = ''; // Clear input field
+
+            // Send message to bot
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: userMessage })
+            });
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -420,29 +552,15 @@
                 return;
             }
 
-            const result = await response.json();
-            document.getElementById('predictionResult').innerText = result.prediction;
-            document.getElementById('confidenceResult').innerText = result.confidence.toFixed(2);
+            // Display bot's response
+            const botResponse = await response.json();
+            chatMessages.innerHTML += `<div><strong>Bot:</strong> ${botResponse.response}</div>`;
+            
+            // Scroll to the bottom of chat
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         });
-
-        document.getElementById('clearBtn').addEventListener('click', () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            document.getElementById('predictionResult').innerText = '';
-            document.getElementById('confidenceResult').innerText = '';
-        });
-
-        // Carousel functionality
-        let currentIndex = 0;
-
-        function moveCarousel(direction) {
-            const projects = document.querySelectorAll('.project');
-            const totalProjects = projects.length;
-            currentIndex = (currentIndex + direction + totalProjects) % totalProjects;
-            const offset = -currentIndex * (projects[0].clientWidth + 20); // Adjusted for gap
-
-            const carouselContainer = document.querySelector('.carousel-container');
-            carouselContainer.style.transform = `translateX(${offset}px)`;
-        }
     </script>
+    
+    
 </body>
 </html>
