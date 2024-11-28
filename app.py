@@ -4,6 +4,7 @@ from PIL import Image
 import io
 import base64
 import tensorflow as tf
+from chatbot import chatbot_response
 
 app = Flask(__name__)
 
@@ -51,6 +52,12 @@ def predict():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500  # Zwróć błąd w formacie JSON
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_message = request.json.get("message", "")
+    bot_response = chatbot_response(user_message)
+    return jsonify({"response": bot_response})
 
 if __name__ == "__main__":
     import os
