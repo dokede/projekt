@@ -3,7 +3,7 @@ from rapidfuzz import process
 
 # Baza wiedzy (możesz ją załadować z pliku JSON)
 portfolio_info = {
-    "doświadczenie": "Pracę w analizię mam od początku 2023 roku",
+    "doświadczenie": "Pracuję w analizię mam od początku 2023 roku",
     "projekty": "Projekty wypisane są powyżej",
     "technologie": "Używam głównie pythona, sql, excel",
     "umiejętności": "Używam głównie pythona, sql, excel",
