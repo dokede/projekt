@@ -498,8 +498,8 @@
             }
     
             const result = await response.json();
-            document.getElementById('predictionResult').innerText = 'Predykcja: ' + result.prediction;
-            document.getElementById('confidenceResult').innerText = 'Pewność: ' + result.confidence.toFixed(2) + '%';
+            document.getElementById('predictionResult').innerText = result.prediction;
+            document.getElementById('confidenceResult').innerText = result.confidence.toFixed(2) + '%';
         });
     
         // Clear canvas and results
