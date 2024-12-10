@@ -43,7 +43,7 @@ def predict():
         # Predykcja za pomocą modelu TensorFlow
         prediction = loaded_model.predict(image_array)
         predicted_class = np.argmax(prediction)
-        confidence = np.max(prediction) * 100
+        confidence = int(np.max(prediction) * 100)
 
         return jsonify({
             'prediction': int(predicted_class),
