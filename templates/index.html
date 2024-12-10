@@ -426,7 +426,7 @@
                 <button id="submitBtn">Przekaż</button>
                 <button id="clearBtn">Wyczyść</button>
                 <h2>Wynik Predykcji: <span id="predictionResult"></span></h2>
-                <h2>Pewność: <span id="confidenceResult"></span></h2>
+                <h2>Pewność: <span id="confidenceResult">%</span></h2>
             </div>
             
             <!-- Sekcja Bota -->
@@ -499,7 +499,7 @@
     
             const result = await response.json();
             document.getElementById('predictionResult').innerText = result.prediction;
-            document.getElementById('confidenceResult').innerText = result.confidence.toFixed(2) ;
+            document.getElementById('confidenceResult').innerText = result.confidence.toFixed(0) ;
         });
     
         // Clear canvas and results
