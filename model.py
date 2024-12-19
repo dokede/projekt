@@ -30,7 +30,7 @@ def create_cnn(kernel_size):
     model.add(layers.Dense(10, activation='softmax'))
     return model
 
-# Wybierz rozmiar jądra (możesz zmienić to na (3, 3), (5, 5) lub (7, 7))
+# Wybieramy rozmiar jądra (możesz zmienić to na (3, 3), (5, 5) lub (7, 7))
 kernel_size = (5, 5)  # Przykład: Kernel 5x5
 cnn = create_cnn(kernel_size)
 
