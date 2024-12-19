@@ -1,7 +1,7 @@
 import json
 from rapidfuzz import process
 
-# Baza wiedzy (możesz ją załadować z pliku JSON)
+# Baza wiedzy
 portfolio_info = {
     "doświadczenie": "Pracuję w analizie danych od początku 2023 roku",
     "projekty": "Projekty wypisane są powyżej",
@@ -22,8 +22,3 @@ def chatbot_response(user_input):
         return portfolio_info[best_match[0]]  # Zwróć odpowiednią wartość na podstawie dopasowanej kategorii
     else:
         return "Nie jestem pewien, co masz na myśli. Spróbuj zapytać inaczej."
-
-# Przykładowe zapytania:
-print(chatbot_response("Jakie masz doświadczenie?"))
-print(chatbot_response("Co umiesz zrobić?"))
-print(chatbot_response("Jaki masz kontakt?"))
